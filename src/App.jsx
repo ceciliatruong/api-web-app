@@ -42,45 +42,39 @@ function App() {
     setName(randomPetName);
   }
   const fetchNewCat = () => {
-    let newCat = null;
+    // let newCat = null;
     const getNewCat = () => {
       fetch(APIurl)
       .then((response) => response.json())
       .then((jsonData) => {
         setData(jsonData);
         if(Array.isArray(jsonData) && jsonData.length > 0) {
-          setCat({
-            breed: jsonData[0].breeds[0].name,
-            origin: jsonData[0].breeds[0].origin,
-            life_span: jsonData[0].breeds[0].life_span,
-            country_code: jsonData[0].breeds[0].country_code,
-            id: jsonData[0].breeds[0].id,
-            img: jsonData[0].url,
-            desc: jsonData[0].breeds[0].description
-          });
+          if(!banList.has(jsonData[0].breeds[0].name) && !banList.has(jsonData[0].breeds[0].origin) && !banList.has(jsonData[0].breeds[0].life_span)) {
+            setCat({
+              breed: jsonData[0].breeds[0].name,
+              origin: jsonData[0].breeds[0].origin,
+              life_span: jsonData[0].breeds[0].life_span,
+              country_code: jsonData[0].breeds[0].country_code,
+              id: jsonData[0].breeds[0].id,
+              img: jsonData[0].url,
+              desc: jsonData[0].breeds[0].description
+            });
+          }
+        }
+        else {
+          getNewCat();
         }
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
       });
     };
-    const tryFetchNewCat = () => {
-      getNewCat();
-      if (newCat === null) {
-        // If the fetched cat is on the ban list, try fetching again
-        tryFetchNewCat();
-      } else {
-        // Set the new cat when it's not on the ban list
-        setCat(newCat);
-      }
-    };
-  
-    tryFetchNewCat();
+    getNewCat();
   };
   // Call fetchNewCat when you want to fetch a new cat, e.g., in response to a button click
   const handleFetchNewCat = () => {
-    generateRandomName();
     fetchNewCat();
+    generateRandomName();
   };
   useEffect(() => {
     // Log the updated banList whenever it changes
